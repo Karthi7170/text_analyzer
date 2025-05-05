@@ -3,3 +3,5 @@ plotly
 transformers
 torch
 wordcloud
+streamlit>=1.14.0
+tornado>=6.1
