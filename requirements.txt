@@ -2,3 +2,4 @@ streamlit
 plotly
 transformers
 torch
+wordcloud
