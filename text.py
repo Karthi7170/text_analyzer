@@ -22,12 +22,18 @@ st.set_page_config(
 # Load models
 @st.cache_resource
 def load_models():
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-    emotion_classifier = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", top_k=None)
-    sentiment_analyzer = pipeline("sentiment-analysis")
-    topic_classifier = pipeline("zero-shot-classification")
-    title_generator = pipeline("summarization", model="t5-small", tokenizer="t5-small")
-    return summarizer, emotion_classifier, sentiment_analyzer, topic_classifier, title_generator
+    try:
+        summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+        emotion_classifier = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", top_k=None)
+        sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+        topic_classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+        title_generator = pipeline("summarization", model="t5-small", tokenizer="t5-small")
+        return summarizer, emotion_classifier, sentiment_analyzer, topic_classifier, title_generator
+    except OSError as e:
+        st.error(
+            "🚨 Error loading models. Make sure the Hugging Face models are cached or internet access is available."
+        )
+        raise e
 
 summarizer, emotion_classifier, sentiment_analyzer, topic_classifier, title_generator = load_models()
 
@@ -56,7 +62,7 @@ def analyze_sentiment(text):
     result = sentiment_analyzer(text)[0]
     return result['label'], result['score']
 
-def classify_topic(text, candidate_labels=["Technology", "Health", "Finance", "Sports", "Politics", "Education","Entertainment"]):
+def classify_topic(text, candidate_labels=["Technology", "Health", "Finance", "Sports", "Politics", "Education", "Entertainment"]):
     result = topic_classifier(text, candidate_labels)
     return result['labels'][0], result['scores'][0]
 
