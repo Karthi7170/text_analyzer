@@ -4,3 +4,4 @@ wordcloud
 transformers
 matplotlib
 pandas
+nltk
